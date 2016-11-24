@@ -316,13 +316,16 @@ class VDIFFrameSet(object):
                               self.invalid_data_value)
         return self._data
 
+    def __len__(self):
+        return len(self.frames)
+
     @property
     def size(self):
-        return len(self.frames) * self.frames[0].size
+        return len(self) * self.frames[0].size
 
     @property
     def shape(self):
-        return (len(self.frames),) + self.frames[0].shape
+        return (len(self),) + self.frames[0].shape
 
     @property
     def dtype(self):

@@ -123,16 +123,18 @@ class CRC(object):
 
 
 def get_frame_rate(fh, header_class):
-    """Returns the number of frames in one second of data."""
+    """Returns the number of frames in one second of data.
+
+    The code assumes that the highest frame number that occurs before
+    the second count increases by 1 can be used to infer the framerate.
+    """
     fh.seek(0)
     header = header_class.fromfile(fh)
-    assert header['frame_nr'] == 0
     sec0 = header.seconds
-    while header['frame_nr'] == 0:
-        fh.seek(header.payloadsize, 1)
-        header = header_class.fromfile(fh)
-    while header['frame_nr'] > 0:
-        max_frame = header['frame_nr']
+    max_frame = 0
+    while header.seconds == sec0:
+        # Don't presume ordering within a second.
+        max_frame = max(header['frame_nr'], max_frame)
         fh.seek(header.payloadsize, 1)
         header = header_class.fromfile(fh)
 
